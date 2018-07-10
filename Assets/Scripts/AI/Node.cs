@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node : MonoBehaviour {
+public abstract class Node
+{
+    public enum NodeState
+    {
+        FAILED,
+        SUCCESS,
+        RUNNING,
+        STATE_COUNT
+    };
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public Node(){}
+    public abstract void Evaluate();
+
+    #region Properties
+    public List<Node> childs { get; protected set; }
+    public NodeState state { get; protected set; }
+    #endregion
 }
