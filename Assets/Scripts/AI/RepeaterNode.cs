@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RepeaterNode : Node {
-    public override void Evaluate()
+    public override NodeState Evaluate()
     {
         throw new System.NotImplementedException();
     }

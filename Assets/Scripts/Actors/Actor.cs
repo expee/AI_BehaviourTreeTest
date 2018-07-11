@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Musketeer : Actor {
+public class Actor : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

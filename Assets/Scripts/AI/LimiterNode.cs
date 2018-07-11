@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class LimiterNode : Node {
 
-    public override void Evaluate()
+    public LimiterNode()
     {
-        throw new System.NotImplementedException();
+        state = NodeState.FAILED;
+    }
+
+    public override NodeState Evaluate()
+    {
+        return state;
     }
 }

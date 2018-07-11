@@ -4,8 +4,18 @@ using UnityEngine;
 
 public class InverterNode : Node
 {
-    public override void Evaluate()
+    public InverterNode(Node tgtNode)
     {
-        //throw new System.NotImplementedException();
+        //Inverter node will always only have 1 child node
+        childs = new List<Node>();
+        childs[0] = tgtNode;
+        state = NodeState.FAILED;
+    }
+
+    public override NodeState Evaluate()
+    {
+        childs[0].Evaluate();
+        state = (childs[0].state == NodeState.FAILED) ? NodeState.SUCCESS : (childs[0].state == NodeState.RUNNING) ? NodeState.RUNNING : NodeState.FAILED;
+        return state;
     }
 }

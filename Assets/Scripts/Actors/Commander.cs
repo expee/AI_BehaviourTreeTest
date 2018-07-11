@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Commander : MonoBehaviour {
+public class Commander : Actor {
 
 	// Use this for initialization
 	void Start () {

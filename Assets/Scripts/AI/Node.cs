@@ -13,7 +13,7 @@ public abstract class Node
     };
 
     public Node(){}
-    public abstract void Evaluate();
+    public abstract NodeState Evaluate();
 
     #region Properties
     public List<Node> childs { get; protected set; }
