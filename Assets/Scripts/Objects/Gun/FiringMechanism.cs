@@ -10,6 +10,7 @@ namespace Gun
 		public Bullet bullet;
 		public int ammoCapacity;
 		public float fireRate;
+		public float reloadSpeed;
 		public float inherentAccuracy;
 
 		private bool _ammoInReceiver;
@@ -21,7 +22,7 @@ namespace Gun
 
 		void Start()
 		{
-
+			ammoRemaining = ammoCapacity;
 		}
 
 		void Update()
@@ -31,19 +32,27 @@ namespace Gun
 
 		public bool Fire()
 		{
-			if(_ammoInReceiver)
+			if(!magazineEmpty && _ammoInReceiver)
 			{
 				Instantiate(bullet, muzzlePosition, transform.rotation);
+				ammoRemaining--;
+				magazineEmpty = ammoRemaining == 0 ? true : false;
 				_ammoInReceiver = false;
 				StartCoroutine("BreechLoading");
 				return true;
 			}
 			//TODO Jam Mechanism
-			return true;
+			return false;
 		}
 
 		public bool Reload()
 		{
+			if(!isReloading)
+			{
+				StartCoroutine("ReloadMagazine");
+				isReloading = true;
+				return true;
+			}
 			return false;
 		}
 
@@ -52,5 +61,18 @@ namespace Gun
 			yield return new WaitForSeconds(fireRate);
 			_ammoInReceiver = true;
 		}
+
+		IEnumerator ReloadMagazine()
+		{
+			yield return new WaitForSeconds(reloadSpeed);
+			ammoRemaining = ammoCapacity;
+			isReloading = false;
+		}
+
+		#region Properties
+		public bool magazineEmpty { get; private set; }
+		public int ammoRemaining { get; private set; }
+		public bool isReloading { get; private set; }
+		#endregion
 	}
 }

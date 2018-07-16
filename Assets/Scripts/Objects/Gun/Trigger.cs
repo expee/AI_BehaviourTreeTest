@@ -15,16 +15,19 @@ namespace Gun
 		};
 
 		//There's no point in using the trigger without its firing mechanism
-		private FiringMechanism _firingMechanism;
+
+
+		private int _firingSuccessCount;
 
 		private void Awake()
 		{
-			_firingMechanism = GetComponent<FiringMechanism>();
+			firingMechanism = GetComponent<FiringMechanism>();
 		}
 
 		void Start()
 		{
-
+			triggerPulled = false;
+			hammerLocked = false;
 		}
 
 		void Update()
@@ -32,25 +35,55 @@ namespace Gun
 
 		}
 
-		public void PullTrigger()
+		public void Pull()
 		{
-			switch(mode)
+			triggerPulled = true;
+			switch (mode)
 			{
 				case FireMode.AUTO:
-					{ }
+					{
+						fireSuccess = firingMechanism.Fire();
+						hammerLocked = false;
+					}
 					break;
 				case FireMode.BURST:
-					{ }
+					{
+						if(!hammerLocked)
+						{
+							fireSuccess = firingMechanism.Fire();
+							if (fireSuccess)
+								_firingSuccessCount++;
+							if (_firingSuccessCount >= 3)
+								hammerLocked = true;
+						}
+
+					}
 					break;
 				case FireMode.SINGLE:
-					{ }
+					{
+						if(!hammerLocked)
+						{
+							fireSuccess = firingMechanism.Fire();
+							if (fireSuccess)
+								hammerLocked = true;
+						}
+					}
 					break;
 			}
 		}
 
+		public void Release()
+		{
+			triggerPulled = false;
+			hammerLocked = false;
+		}
+
 		#region Properties
 		public FireMode mode { get; set; }
-
+		public FiringMechanism firingMechanism { get; private set; }
+		public bool fireSuccess { get; private set; }
+		public bool hammerLocked { get; private set; }
+		public bool triggerPulled { get; private set; }
 		#endregion
 	}
 }
