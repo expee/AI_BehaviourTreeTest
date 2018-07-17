@@ -28,11 +28,7 @@ namespace Gun
 		{
 			triggerPulled = false;
 			hammerLocked = false;
-		}
-
-		void Update()
-		{
-
+			_firingSuccessCount = 0;
 		}
 
 		public void Pull()

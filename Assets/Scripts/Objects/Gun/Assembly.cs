@@ -11,6 +11,7 @@ namespace Gun
 			OK,
 			MAGAZINE_EMPTY,
 			HAMMER_LOCKED,
+			RELOADING,
 			STATE_COUNT
 		}
 
@@ -23,12 +24,21 @@ namespace Gun
 
 		void Start()
 		{
-
+			_trigger.mode = Trigger.FireMode.AUTO;
 		}
 
 		void Update()
 		{
-
+			if(state == GunAssemblyState.OK)
+			{
+				Fire();
+			}
+			CheckGun();
+			if (state == GunAssemblyState.MAGAZINE_EMPTY)
+			{
+				StopFire();
+				ReloadGun();
+			}
 		}
 
 		public void Fire()
@@ -51,6 +61,11 @@ namespace Gun
 			else if(isHammerLocked())
 			{
 				state = GunAssemblyState.HAMMER_LOCKED;
+				return state;
+			}
+			else if(isReloading())
+			{
+				state = GunAssemblyState.RELOADING;
 				return state;
 			}
 			else
@@ -78,6 +93,11 @@ namespace Gun
 		public bool isHammerLocked()
 		{
 			return _trigger.hammerLocked;
+		}
+
+		public bool isReloading()
+		{
+			return _trigger.firingMechanism.isReloading;
 		}
 
 		#region Properties
