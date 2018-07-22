@@ -40,8 +40,11 @@ public class Commander : Actor
     private LeafNode _aimAtEnemyGeneralDirection;
     private LeafNode _panic;
 
+
+    private Locomotion.BotGait _gait;
     private void Awake()
     {
+        _gait = GetComponent<Locomotion.BotGait>();
         CreateBehaviourTree();
         ResetCharacteristic();
     }
@@ -56,8 +59,8 @@ public class Commander : Actor
     {
         if (isCharacteristicSet)
             _rootNode.Evaluate();
-        else
-            Debug.LogError("ERROR!! Characteristics for " + gameObject.name + " haven't been set");
+        //else
+        //    Debug.LogError("ERROR!! Characteristics for " + gameObject.name + " haven't been set");
 	}
 
     private void CreateBehaviourTree()
@@ -101,16 +104,17 @@ public class Commander : Actor
     #region LeafNode Actions
     Node.NodeState Run()
     {
-        if (actionStates.run != Node.NodeState.RUNNING)
+        Locomotion.BotGait.LocomotionState locoState = _gait.CheckLocomotionState();
+        if(locoState == Locomotion.BotGait.LocomotionState.IDLE)
         {
-            StartCoroutine("Action_Run");
-            actionStates.run = Node.NodeState.RUNNING;
+
         }
         return actionStates.run;
     }
 
     Node.NodeState FireOnTheRun()
     {
+        actionStates.fireOnTheRun = Node.NodeState.FAILED;
         return actionStates.fireOnTheRun;
     }
 

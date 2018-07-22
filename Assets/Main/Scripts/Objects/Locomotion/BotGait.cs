@@ -11,6 +11,8 @@ namespace Locomotion
         {
             MOVING,
             BLOCKED,
+            ARRIVED,
+            IDLE,
             STATE_COUNT
         }
         private NavMeshAgent _nmAgent;
@@ -22,7 +24,7 @@ namespace Locomotion
 
         private void Update()
         {
-            
+
         }
 
         public void SetBotDestination(Vector2 tgt)
@@ -31,9 +33,34 @@ namespace Locomotion
             _nmAgent.SetDestination(tgtPos);
         }
 
-        public void CheckLocomotionState()
+        public LocomotionState CheckLocomotionState()
         {
-
+            if(_nmAgent.velocity.magnitude != 0 && _nmAgent.remainingDistance > _nmAgent.stoppingDistance)
+            {
+                state = LocomotionState.MOVING;
+                return state;
+            }
+            else if(_nmAgent.velocity.magnitude == 0 && _nmAgent.remainingDistance <= _nmAgent.stoppingDistance)
+            {
+                state = LocomotionState.ARRIVED;
+                _nmAgent.ResetPath();
+                return state;
+            }
+            else if (_nmAgent.pathStatus == NavMeshPathStatus.PathInvalid || _nmAgent.pathStatus == NavMeshPathStatus.PathPartial)
+            {
+                state = LocomotionState.BLOCKED;
+                return state;
+            }
+            else if(_nmAgent.velocity.magnitude == 0 && !_nmAgent.hasPath)
+            {
+                state = LocomotionState.IDLE;
+                return state;
+            }
+            else
+            {
+                state = LocomotionState.IDLE;
+                return state;
+            }
         }
 
         public Vector3 tgtPos { get; private set; }

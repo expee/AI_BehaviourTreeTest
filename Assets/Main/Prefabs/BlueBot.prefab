@@ -244,7 +244,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4165862442074998}
-  - component: {fileID: 95113729849805926}
   m_Layer: 0
   m_Name: Hat Rigged
   m_TagString: Untagged
@@ -1015,6 +1014,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4103156456475844}
+  - component: {fileID: 195100139723179886}
+  - component: {fileID: 114308695971181866}
+  - component: {fileID: 114672587231470884}
   m_Layer: 0
   m_Name: BlueBot
   m_TagString: Untagged
@@ -2695,7 +2697,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1358259176242826}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.57, y: 7.22, z: 46.77}
+  m_LocalPosition: {x: 30.99, y: 0, z: 46.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4511258141127508}
@@ -2725,7 +2727,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1351143668191432}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.41, y: 0, z: 0.67}
+  m_LocalPosition: {x: 0.41, y: 1, z: 0.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4299573427264230}
@@ -2915,7 +2917,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1058286119964370}
   m_LocalRotation: {x: -0.07262893, y: 0, z: 0, w: 0.99735904}
-  m_LocalPosition: {x: 0, y: -8.58, z: 1.4}
+  m_LocalPosition: {x: 0, y: -7.58, z: 1.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4677775146656350}
@@ -3703,7 +3705,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1715246172644148}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4103156456475844}
@@ -4844,24 +4846,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1351143668191432}
   m_Mesh: {fileID: 4300000, guid: 47debd9033d666b41bbadf28db4af725, type: 3}
---- !u!95 &95113729849805926
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1058286119964370}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 8c19351b9d1028f45af3e358a7cabf51, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114202062167199304
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4879,6 +4863,17 @@ MonoBehaviour:
   fireRate: 0.05
   reloadSpeed: 2
   inherentAccuracy: 0.65
+--- !u!114 &114308695971181866
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1358259176242826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f249a1168059e04c8bf7fd32281798f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114453098748261096
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4888,6 +4883,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f721fdce2a621b49a43f1122d0f1a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114672587231470884
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1358259176242826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 156509632cda5f54693e846688ed6df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114951481940430634
@@ -4995,3 +5001,24 @@ SkinnedMeshRenderer:
     m_Center: {x: -141.4624, y: 2.345192, z: 11.361938}
     m_Extent: {x: 69.01396, y: 94.70577, z: 138.76517}
   m_DirtyAABB: 0
+--- !u!195 &195100139723179886
+NavMeshAgent:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1358259176242826}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.3
+  m_Speed: 5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 200
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
