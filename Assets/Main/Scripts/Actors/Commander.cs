@@ -99,7 +99,7 @@ public class Commander : Actor
         bravery = 0;
         accuracy = 0;
         isCharacteristicSet = false;
-    }
+    } 
 
     #region LeafNode Actions
     Node.NodeState Run()
@@ -107,7 +107,6 @@ public class Commander : Actor
         Locomotion.BotGait.LocomotionState locoState = _gait.CheckLocomotionState();
         if(locoState == Locomotion.BotGait.LocomotionState.IDLE)
         {
-
         }
         return actionStates.run;
     }

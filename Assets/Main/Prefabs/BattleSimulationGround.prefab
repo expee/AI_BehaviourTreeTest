@@ -26,7 +26,7 @@ GameObject:
   m_Name: RustyBox (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1303921898785462
@@ -44,7 +44,7 @@ GameObject:
   m_Name: MetalBox (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1309790602129124
@@ -62,7 +62,7 @@ GameObject:
   m_Name: MetalBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1331011187158084
@@ -76,12 +76,13 @@ GameObject:
   - component: {fileID: 33105333611852004}
   - component: {fileID: 23939538270058662}
   - component: {fileID: 65546002142709826}
+  - component: {fileID: 114283487989174904}
   m_Layer: 0
   m_Name: RustyBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1363862671504218
 GameObject:
@@ -98,7 +99,7 @@ GameObject:
   m_Name: RustyBox (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1365195328207190
@@ -116,7 +117,7 @@ GameObject:
   m_Name: MetalBox (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1441509756815280
@@ -134,7 +135,7 @@ GameObject:
   m_Name: RustyBox (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1449730866455826
@@ -182,7 +183,7 @@ GameObject:
   m_Name: RustyBox (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1561376452540930
@@ -200,7 +201,7 @@ GameObject:
   m_Name: RustyBox (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1604363061594834
@@ -218,7 +219,7 @@ GameObject:
   m_Name: RustyBox (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1631417961477570
@@ -253,7 +254,7 @@ GameObject:
   m_Name: MetalBox (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1854767929967264
@@ -271,7 +272,7 @@ GameObject:
   m_Name: MetalBox (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1875093685501632
@@ -289,7 +290,7 @@ GameObject:
   m_Name: MetalBox (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1893276650221420
@@ -307,7 +308,7 @@ GameObject:
   m_Name: RustyBox (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1934671396901820
@@ -325,7 +326,7 @@ GameObject:
   m_Name: MetalBox (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
+  m_NavMeshLayer: 1
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &4020206126085510
@@ -494,9 +495,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1331011187158084}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 49.46, y: 0.5, z: 43.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 49, y: 0.5, z: 43}
+  m_LocalScale: {x: 4.21, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4104761908232522}
   m_RootOrder: 0
@@ -1389,6 +1390,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114283487989174904
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1331011187158084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35949852cc132824f9d5981d81008e64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upperLeft: {fileID: 0}
+  upperRight: {fileID: 0}
+  lowerLeft: {fileID: 0}
+  lowerRight: {fileID: 0}
 --- !u!154 &154044092088392574
 TerrainCollider:
   m_ObjectHideFlags: 1
