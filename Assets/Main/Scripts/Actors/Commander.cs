@@ -98,7 +98,7 @@ public class Commander : Actor
         isCharacteristicSet = false;
     }
 
-    #region LeafNodeActions
+    #region LeafNode Actions
     Node.NodeState Run()
     {
         if (actionStates.run != Node.NodeState.RUNNING)
@@ -153,11 +153,14 @@ public class Commander : Actor
     {
         return actionStates.panic;
     }
+
+    #region Action Coroutines
     IEnumerator Action_Run()
     {
         actionStates.run = Node.NodeState.RUNNING;
         yield return null;
     }
+    #endregion
     #endregion
 
     #region Properties
