@@ -6,7 +6,7 @@ namespace Gun
 {
 	public class FiringMechanism : MonoBehaviour
 	{
-		public Vector3 muzzlePosition;
+		public GameObject muzzle;
 		public Bullet bullet;
 		public int ammoCapacity;
 		public float fireRate;
@@ -23,18 +23,16 @@ namespace Gun
 		void Start()
 		{
 			ammoRemaining = ammoCapacity;
-		}
-
-		void Update()
-		{
-
+			isReloading = false;
+			_ammoInReceiver = true;
+			magazineEmpty = false;
 		}
 
 		public bool Fire()
 		{
 			if(!magazineEmpty && _ammoInReceiver)
 			{
-				Instantiate(bullet, muzzlePosition, transform.rotation);
+				Instantiate(bullet, muzzle.transform.position, muzzle.transform.rotation);
 				ammoRemaining--;
 				magazineEmpty = ammoRemaining == 0 ? true : false;
 				_ammoInReceiver = false;
@@ -65,6 +63,8 @@ namespace Gun
 		IEnumerator ReloadMagazine()
 		{
 			yield return new WaitForSeconds(reloadSpeed);
+			magazineEmpty = false;
+			_ammoInReceiver = true;
 			ammoRemaining = ammoCapacity;
 			isReloading = false;
 		}
