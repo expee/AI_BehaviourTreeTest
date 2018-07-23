@@ -574,7 +574,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c23bb361c053214ab719be9d67f33e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Team: 1
+  Team: 2
   MaxPower: 1000
 --- !u!114 &114762390662617304
 MonoBehaviour:
