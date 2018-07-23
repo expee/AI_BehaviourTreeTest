@@ -55,7 +55,6 @@ public class CheckPointEngine : MonoBehaviour {
                 {
                     case GameManager.Team.E_BLUE:
                         color = Color.blue;
-
                         break;
                     case GameManager.Team.E_RED:
                         color = Color.red;
