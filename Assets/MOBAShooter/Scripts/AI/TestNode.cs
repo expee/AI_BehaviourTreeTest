@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class TestNode : Node
 {
-	public delegate bool NodeTest();
-	private NodeTest _testMethod;
+	public delegate bool TestMethod();
+	private TestMethod _testMethod;
 
-	public TestNode(Node tgtNode, NodeTest testMethod)
+	public TestNode(Node tgtNode, TestMethod delegatedTestMethod)
 	{
-		_testMethod = testMethod;
+		_testMethod = delegatedTestMethod;
 		childs = new List<Node>
 		{
 			tgtNode
