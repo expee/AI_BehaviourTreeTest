@@ -20,16 +20,25 @@ public class RepeaterNode : Node
 
     public override NodeState Evaluate()
     {
-		if(++_repeatCount < maxRepeatCount)
+		while(_repeatCount < maxRepeatCount)
 		{
 			state = childs[0].Evaluate();
-			return state;
+			switch (state)
+			{
+				case NodeState.RUNNING:
+					continue;
+				case NodeState.FAILED:
+					_repeatCount++;
+					break;
+				case NodeState.SUCCESS:
+					_repeatCount = 0;
+					return state;
+			}
 		}
-		else
-		{
-			state = NodeState.FAILED;
-			return state;
-		}
+		//repeat count is max
+		_repeatCount = 0;
+		state = NodeState.FAILED;
+		return state;
     }
 
 	public int maxRepeatCount { get; private set; }
