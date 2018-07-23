@@ -8,9 +8,6 @@ public class Communicator : MonoBehaviour {
     public class Message
     {
         public enum CommunicationType { CHASE_ENEMY, GOTO_CHECKPOINT }
-        GameObject agent;
-        CommunicationType type;
-        GameObject target;
 
         public Message(GameObject agent, GameObject target, Message.CommunicationType type)
         {
@@ -19,23 +16,28 @@ public class Communicator : MonoBehaviour {
             this.type = type;
         }
 
-        public GameObject Agent
-        {
-            get { return agent; }
-        }
-    }
-
-    public List<Message> Messages;
+        public GameObject agent { get; private set; }
+		public CommunicationType type { get; private set; }
+		public GameObject target { get; private set; }
+	}
 
     public void AddMessage(GameObject agent, GameObject target, Message.CommunicationType type)
     {
         Message message = new Message(agent, target, type);
+		messages.Add(message);
     }
 
     public void DeleteMessage(GameObject agent)
     {
-        Message message = Messages.Find(x => x.Agent == agent);
+        Message message = messages.Find(x => x.agent == agent);
 
-        Messages.Remove(message);
+        messages.Remove(message);
     }
+
+	public List<Message> Find(Message.CommunicationType type)
+	{
+		return messages.FindAll(x => x.type == type);
+	}
+
+	public List<Message> messages { get; private set; }
 }

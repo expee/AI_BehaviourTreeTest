@@ -21,7 +21,9 @@ public class SelectorNode : Node
                 switch (state)
                 {
                     case NodeState.SUCCESS:
-                        return state;
+						isAnyChildRunning = false;
+						currentRunningChild = null;
+						return state;
                     case NodeState.RUNNING:
                         currentRunningChild = child;
                         isAnyChildRunning = true;
@@ -45,7 +47,9 @@ public class SelectorNode : Node
                 switch (state)
                 {
                     case NodeState.SUCCESS:
-                        return state;
+						isAnyChildRunning = false;
+						currentRunningChild = null;
+						return state;
                     case NodeState.RUNNING:
                         currentRunningChild = childs[i];
                         isAnyChildRunning = true;

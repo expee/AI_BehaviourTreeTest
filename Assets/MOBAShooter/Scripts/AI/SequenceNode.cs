@@ -28,7 +28,9 @@ public class SequenceNode : Node
                         isAnyChildRunning = true;
                         return state;
                     case NodeState.FAILED:
-                        return state;
+						isAnyChildRunning = false;
+						currentRunningChild = null;
+						return state;
                 }
             }
             //All success
@@ -52,7 +54,9 @@ public class SequenceNode : Node
                         isAnyChildRunning = true;
                         return state;
                     case NodeState.FAILED:
-                        return state;
+						isAnyChildRunning = false;
+						currentRunningChild = null;
+						return state;
                 }
             }
             //All success
