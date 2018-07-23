@@ -7,7 +7,7 @@ public class TowerManagement : MonoBehaviour {
     public GameManager.Team Team;
     public List<GameObject> ListPlayerInside;
     public SpawnManager TeamSpawn;
-    public float Range = 2f;
+    public float Range = 10000f;
 
     private void Start()
     {
@@ -66,9 +66,10 @@ public class TowerManagement : MonoBehaviour {
             if(enemy.tag == "Player")
             {
                 AgentController agen = enemy.GetComponent<AgentController>();
-                if(agen != null && agen.Team != Team)
+                if (agen != null && agen.Team != Team)
                 {
-                    if(enemyNearestDistance > 0 && enemyNearestDistance > Vector3.Distance(agen.transform.position, transform.position))
+                    
+                    if (enemyNearestDistance > 0 && enemyNearestDistance > Vector3.Distance(agen.transform.position, transform.position))
                     {
                         enemyNearestDistance = Vector3.Distance(agen.transform.position, transform.position);
                         nearestEnemy = agen.gameObject;
@@ -101,5 +102,18 @@ public class TowerManagement : MonoBehaviour {
 
         }
         return nearestPlayer;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if(Team == GameManager.Team.E_RED)
+        {
+            Gizmos.color = Color.red;
+        }
+        else
+        {
+            Gizmos.color = Color.blue;
+        }
+        Gizmos.DrawWireSphere(transform.position, Range);
     }
 }

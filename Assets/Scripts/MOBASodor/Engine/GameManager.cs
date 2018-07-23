@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
     public static GameManager _this;
 
-    public enum Team { E_BLUE, E_RED, E_TEAM_COUNT}
+    public enum Team {E_NONE, E_BLUE, E_RED, E_TEAM_COUNT}
     public enum GameState { IDLE, STARTED, FINISH}
 
     public List<GameObject> Towers;

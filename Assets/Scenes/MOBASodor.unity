@@ -978,7 +978,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &815029974
 Transform:
   m_ObjectHideFlags: 0
@@ -1269,7 +1269,7 @@ MonoBehaviour:
   Team: 0
   ListPlayerInside: []
   TeamSpawn: {fileID: 1437337215}
-  Range: 100
+  Range: 135.5
 --- !u!65 &1135140033
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1595,7 +1595,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.17666666
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: cc9a865cc2abf7242b34614aded8b4c1, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: d2daa99d758db1d49babb27cbad2eb8a, type: 2}
 --- !u!1 &1656967491
 GameObject:
   m_ObjectHideFlags: 0
@@ -2214,7 +2214,7 @@ MonoBehaviour:
   Team: 1
   ListPlayerInside: []
   TeamSpawn: {fileID: 1748510189}
-  Range: 100
+  Range: 131.43
 --- !u!65 &2114196106
 BoxCollider:
   m_ObjectHideFlags: 0

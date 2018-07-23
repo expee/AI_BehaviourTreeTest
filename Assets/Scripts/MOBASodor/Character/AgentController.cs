@@ -22,13 +22,15 @@ public class AgentController : MonoBehaviour {
 
     SelectorNode n_root;
     SequenceNode n_backToTower;
-    InverterNode n_lureEnemy;
+    SequenceNode n_lureEnemy;
     SequenceNode n_chaseEnemy;
     InverterNode n_runningFromEnemy;
+    InverterNode n_NoEnemyNearTower;
     LeafNode n_isTowerEmpty;
     LeafNode n_isEnemyNearTower;
     LeafNode n_isPlayerClosestWithTower;
     LeafNode n_isPlayerPowerHigerThanEnemy;
+    LeafNode n_RandomValue;
     bool b_isProcessing;
     TowerManagement tm_teamTower;
 
@@ -114,12 +116,12 @@ public class AgentController : MonoBehaviour {
 
     protected void DefineNode()
     {
-        Debug.Log("Define Node");
         //leaf node
         n_isTowerEmpty = new LeafNode(IsTowerEmpty);
         n_isEnemyNearTower = new LeafNode(IsEnemyNearTower);
         n_isPlayerClosestWithTower = new LeafNode(IsPlayerClosesWithTower);
         n_isPlayerPowerHigerThanEnemy = new LeafNode(IsPlayerPowerHigerThanEnemy);
+        n_RandomValue = new LeafNode(RandomValue);
 
         //sequence
         n_backToTower = new SequenceNode(new List<Node>
@@ -129,14 +131,21 @@ public class AgentController : MonoBehaviour {
             n_isPlayerClosestWithTower
         });
 
+        //n_lureEnemy = new SequenceNode(new List<Node>
+        //{
+        //    n_RandomValue,
+        //    n_NoEnemyNearTower
+        //});
+
         n_chaseEnemy = new SequenceNode(new List<Node>
         {
+            n_RandomValue,
             n_isPlayerPowerHigerThanEnemy
         });
 
         //inverter
-        n_lureEnemy = new InverterNode(n_isEnemyNearTower);
         n_runningFromEnemy = new InverterNode(n_isPlayerPowerHigerThanEnemy);
+        //n_NoEnemyNearTower = new InverterNode(n_isEnemyNearTower);
 
         b_isProcessing = false;
         tm_teamTower = m_teamTower.GetComponent<TowerManagement>();
@@ -147,14 +156,13 @@ public class AgentController : MonoBehaviour {
             n_backToTower,
             n_chaseEnemy,
             n_runningFromEnemy,
-            n_lureEnemy
+            //n_lureEnemy
         });
     }
 
     protected void Action()
     {
 
-        Debug.Log("AI action");
 
         if (!b_isProcessing)
         {
@@ -196,9 +204,10 @@ public class AgentController : MonoBehaviour {
     //Running From Enemy -> Inverter
     Node.NodeState IsPlayerPowerHigerThanEnemy()
     {
+        nearestEnemy = tm_teamTower.GetNearestEnemy();
         if (nearestEnemy != null && nearestEnemy.GetComponent<AgentController>() != null)
         {
-            if (nearestEnemy.GetComponent<AgentController>().Power < Power)
+            if (nearestEnemy.GetComponent<AgentController>().Power <= Power)
                 return Node.NodeState.SUCCESS;
             else
                 return Node.NodeState.FAILED;
@@ -207,6 +216,15 @@ public class AgentController : MonoBehaviour {
         {
             return Node.NodeState.FAILED;
         }
+    }
+
+    Node.NodeState RandomValue()
+    {
+        float randomValue = Random.value;
+        if (randomValue > 0.7)
+            return Node.NodeState.SUCCESS;
+        else
+            return Node.NodeState.FAILED;
     }
 
 
@@ -231,11 +249,11 @@ public class AgentController : MonoBehaviour {
             Debug.Log("Running from enemy");
             ChaseObject = tm_teamTower.TeamSpawn.gameObject;
         }
-        else if (n_lureEnemy.state == Node.NodeState.SUCCESS)
-        {
-            Debug.Log("Lure enemy");
-            ChaseObject = m_enemyTower;
-        }
+        //else if (n_lureEnemy.state == Node.NodeState.SUCCESS)
+        //{
+        //    Debug.Log("Lure enemy");
+        //    ChaseObject = m_enemyTower;
+        //}
         b_isProcessing = false;
     }
 
