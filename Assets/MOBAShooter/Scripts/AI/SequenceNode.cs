@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SequenceNode : Node
 {
-    public SequenceNode(List<Node> tgtChilds)
+	public SequenceNode(List<Node> tgtChilds, bool isForceCheck)
     {
+		forceCheck = isForceCheck;
         currentRunningChild = null;
         isAnyChildRunning = false;
         state = NodeState.FAILED;
@@ -42,7 +43,27 @@ public class SequenceNode : Node
         else
         {
             int startIdx = childs.FindIndex(nd => nd.Equals(currentRunningChild));
-            for (int i = startIdx; i < childs.Count; i++)
+			for (int i = 0; i < startIdx; i++)
+			{
+				if(childs[i].forceCheck)
+				{
+					childs[i].Evaluate();
+					switch (state)
+					{
+						case NodeState.SUCCESS:
+							continue;
+						case NodeState.RUNNING:
+							currentRunningChild = childs[i];
+							isAnyChildRunning = true;
+							return state;
+						case NodeState.FAILED:
+							isAnyChildRunning = false;
+							currentRunningChild = null;
+							return state;
+					}
+				}
+			}
+			for (int i = startIdx; i < childs.Count; i++)
             {
                 state = childs[i].Evaluate();
                 switch (state)

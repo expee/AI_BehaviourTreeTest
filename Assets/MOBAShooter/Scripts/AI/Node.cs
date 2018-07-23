@@ -18,5 +18,6 @@ public abstract class Node
     #region Properties
     public List<Node> childs { get; protected set; }
     public NodeState state { get; protected set; }
+	public bool forceCheck { get; protected set; }
     #endregion
 }

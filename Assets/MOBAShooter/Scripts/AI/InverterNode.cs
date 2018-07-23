@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class InverterNode : Node
 {
-    public InverterNode(Node tgtNode)
+    public InverterNode(Node tgtNode, bool isForceCheck)
     {
+		forceCheck = isForceCheck;
         //Inverter node will always only have 1 child node
         childs = new List<Node>();
         childs.Add(tgtNode);

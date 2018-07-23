@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SelectorNode : Node
 {
-    public SelectorNode(List<Node> tgtChilds)
+    public SelectorNode(List<Node> tgtChilds, bool isForceCheck)
     {
+		forceCheck = isForceCheck;
         currentRunningChild = null;
         isAnyChildRunning = false;
         state = NodeState.FAILED;
@@ -41,7 +42,27 @@ public class SelectorNode : Node
         else
         {
             int startIdx = childs.FindIndex(nd => nd.Equals(currentRunningChild));
-            for (int i = startIdx; i < childs.Count; i++)
+			for (int i = 0; i < startIdx; i++)
+			{
+				if(childs[i].forceCheck)
+				{
+					childs[i].Evaluate();
+					switch (state)
+					{
+						case NodeState.SUCCESS:
+							isAnyChildRunning = false;
+							currentRunningChild = null;
+							return state;
+						case NodeState.RUNNING:
+							currentRunningChild = childs[i];
+							isAnyChildRunning = true;
+							return state;
+						case NodeState.FAILED:
+							continue;
+					}
+				}
+			}
+			for (int i = startIdx; i < childs.Count; i++)
             {
                 state = childs[i].Evaluate();
                 switch (state)

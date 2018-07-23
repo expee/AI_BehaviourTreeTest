@@ -7,8 +7,9 @@ public class TestNode : Node
 	public delegate bool TestMethod();
 	private TestMethod _testMethod;
 
-	public TestNode(Node tgtNode, TestMethod delegatedTestMethod)
+	public TestNode(Node tgtNode, TestMethod delegatedTestMethod, bool isForceCheck)
 	{
+		forceCheck = isForceCheck;
 		_testMethod = delegatedTestMethod;
 		childs = new List<Node>
 		{
