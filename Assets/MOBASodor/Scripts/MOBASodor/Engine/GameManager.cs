@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour {
     public enum GameState { IDLE, STARTED, FINISH}
 
     public List<GameObject> Towers;
-    public GameState State;
+    public List<GameObject> CheckPoints;
+    [HideInInspector] public GameState State;
 
     private GameState t_state;
     private UnityEvent m_pauseEvent;

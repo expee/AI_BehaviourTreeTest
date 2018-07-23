@@ -103,17 +103,4 @@ public class TowerManagement : MonoBehaviour {
         }
         return nearestPlayer;
     }
-
-    private void OnDrawGizmos()
-    {
-        if(Team == GameManager.Team.E_RED)
-        {
-            Gizmos.color = Color.red;
-        }
-        else
-        {
-            Gizmos.color = Color.blue;
-        }
-        Gizmos.DrawWireSphere(transform.position, Range);
-    }
 }
