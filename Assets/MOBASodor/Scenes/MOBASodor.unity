@@ -1786,7 +1786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpawnCharacter: 4
-  TeamColor: 0
+  TeamColor: 1
   Agent: {fileID: 1986835752871380, guid: 6e7a07caf42b8e140a2048d959b4b45a, type: 2}
   SpawnRange: 10
   ListTeamPlayer: []
@@ -2246,7 +2246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpawnCharacter: 4
-  TeamColor: 1
+  TeamColor: 2
   Agent: {fileID: 1790795175477530, guid: 1ecc1b344dd9095408d2412ef89946f1, type: 2}
   SpawnRange: 0.5
   ListTeamPlayer: []
