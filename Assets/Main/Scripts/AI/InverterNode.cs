@@ -8,7 +8,7 @@ public class InverterNode : Node
     {
         //Inverter node will always only have 1 child node
         childs = new List<Node>();
-        childs[0] = tgtNode;
+        childs.Add(tgtNode);
         state = NodeState.FAILED;
     }
 
