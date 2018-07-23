@@ -8,15 +8,14 @@ public class AgentController : MonoBehaviour {
 
     public GameManager.Team Team;
     public float MaxPower = 1000;
+    public float RangeToFindEnemy = 10f;
+    public GameObject TeamTower;
 
     protected GameObject m_enemyTower = null;
     protected GameObject m_teamTower = null;
-
     protected Vector3 t_goal;
-    
     protected float CurrentPower;
     protected bool b_isPowerDraining;
-
     protected NavMeshAgent agent;
     protected GameObject ChaseObject;
 
@@ -31,33 +30,11 @@ public class AgentController : MonoBehaviour {
     LeafNode n_isPlayerClosestWithTower;
     LeafNode n_isPlayerPowerHigerThanEnemy;
     LeafNode n_RandomValue;
+
     bool b_isProcessing;
     TowerManagement tm_teamTower;
-
     GameObject nearestEnemy;
-
-
-    public void OnPause()
-    {
-        agent.isStopped = true;
-    }
-
-    public void RefreshPower()
-    {
-        CurrentPower = MaxPower;
-        b_isPowerDraining = false;
-    }
-
-    public void DrainPower()
-    {
-        b_isPowerDraining = true;
-    }
-
-    public float Power
-    {
-        get { return CurrentPower; }
-    }
-
+    Communicator m_communicator;
 
     // Use this for initialization
     protected void Start()
@@ -85,13 +62,7 @@ public class AgentController : MonoBehaviour {
         }
         //define node AI
         DefineNode();
-        //set agent destination
-        //if (m_enemyTower != null)
-        //{
-        //    goal = m_enemyTower.transform.position;
-        //    t_goal = goal;
-        //    agent.destination = goal;
-        //}
+        m_communicator = m_teamTower.GetComponent<Communicator>();
     }
 
     protected void FixedUpdate()
@@ -105,13 +76,28 @@ public class AgentController : MonoBehaviour {
             agent.destination = ChaseObject.transform.position;
             t_goal = ChaseObject.transform.position;
         }
+    }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, RangeToFindEnemy);
+    }
 
-        //if (goal != t_goal)
-        //{
-        //    agent.destination = goal;
-        //    t_goal = goal;
-        //}
+    public void OnPause()
+    {
+        agent.isStopped = true;
+    }
+
+    public void RefreshPower()
+    {
+        CurrentPower = MaxPower;
+        b_isPowerDraining = false;
+    }
+
+    public void DrainPower()
+    {
+        b_isPowerDraining = true;
     }
 
     protected void DefineNode()
@@ -227,6 +213,39 @@ public class AgentController : MonoBehaviour {
             return Node.NodeState.FAILED;
     }
 
+    Node.NodeState GetClosestEnemy()
+    {
+        Collider[] objects = Physics.OverlapSphere(transform.position, RangeToFindEnemy);
+
+        if (objects.Length > 0)
+        {
+            GameObject closestEnemy = null;
+            float closestDistance = 0;
+            List<Communicator.Message> messages = m_communicator.Find(Communicator.Message.CommunicationType.CHASE_ENEMY);
+            for(int i = 0; i < objects.Length; i++)
+            {
+                Communicator.Message obj = messages.Find(x => x.agent == objects[i].gameObject);
+                if(messages.IndexOf(obj) < 0)
+                {
+                    float distance = Vector3.Distance(transform.position, objects[i].transform.position);
+                    if (closestDistance > 0 && closestDistance > distance)
+                    {
+                        closestEnemy = objects[i].gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+
+            nearestEnemy = closestEnemy;
+            if(closestEnemy != null)
+                return Node.NodeState.SUCCESS;
+            else
+                return Node.NodeState.FAILED;
+        }
+
+        return Node.NodeState.FAILED;
+
+    }
 
     IEnumerator EvaluateBehaviour()
     {
@@ -257,4 +276,8 @@ public class AgentController : MonoBehaviour {
         b_isProcessing = false;
     }
 
+    public float Power
+    {
+        get { return CurrentPower; }
+    }
 }

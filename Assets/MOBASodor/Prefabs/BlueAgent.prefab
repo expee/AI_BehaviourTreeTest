@@ -469,6 +469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Team: 1
   MaxPower: 1000
+  RangeToFindEnemy: 15
 --- !u!114 &114818513192055562
 MonoBehaviour:
   m_ObjectHideFlags: 1
