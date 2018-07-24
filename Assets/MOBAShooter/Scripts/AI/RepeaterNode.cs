@@ -6,9 +6,8 @@ public class RepeaterNode : Node
 {
 	private int _repeatCount;
 
-	public RepeaterNode(Node tgtNode, int maxRepeat, bool isForceCheck)
+	public RepeaterNode(Node tgtNode, int maxRepeat)
 	{
-		forceCheck = isForceCheck;
 		//Repeater node will always only have 1 child node
 		maxRepeatCount = maxRepeat;
 		_repeatCount = 0;

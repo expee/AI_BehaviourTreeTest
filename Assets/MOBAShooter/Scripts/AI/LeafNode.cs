@@ -7,9 +7,8 @@ public class LeafNode : Node
     public delegate NodeState NodeAction ();
     private NodeAction action;
 
-    public LeafNode(NodeAction delegatedAction, bool isForceCheck)
+    public LeafNode(NodeAction delegatedAction)
     {
-		forceCheck = isForceCheck;
         action = delegatedAction;
         state = NodeState.FAILED;
     }
