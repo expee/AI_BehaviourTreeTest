@@ -576,7 +576,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Team: 2
   MaxPower: 1000
-  RangeToFindEnemy: 15
+  RangeToFindEnemy: 30
+  TeamTower: {fileID: 0}
 --- !u!114 &114762390662617304
 MonoBehaviour:
   m_ObjectHideFlags: 1

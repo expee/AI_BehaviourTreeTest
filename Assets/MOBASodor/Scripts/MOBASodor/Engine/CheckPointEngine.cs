@@ -84,4 +84,22 @@ public class CheckPointEngine : MonoBehaviour {
     {
         isRaid = false;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Player")
+        {
+            isRaid = true;
+            WhoIsRaiding = other.GetComponent<AgentController>().Team;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            isRaid = false;
+            WhoIsRaiding = GameManager.Team.E_NONE;
+        }
+    }
 }

@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class AgentController : MonoBehaviour {
 
+    protected enum E_Action {IDLE, BACK_TO_TOWER, GOTO_CHECKPOINT, ACTION_COUNT}
+
     public GameManager.Team Team;
     public float MaxPower = 1000;
     public float RangeToFindEnemy = 10f;
@@ -18,30 +20,44 @@ public class AgentController : MonoBehaviour {
     protected bool b_isPowerDraining;
     protected NavMeshAgent agent;
     protected GameObject ChaseObject;
+    protected E_Action currentAction;
+    protected GameManager manager;
 
     SelectorNode n_root;
-    SequenceNode n_backToTower;
-    SequenceNode n_lureEnemy;
-    SequenceNode n_chaseEnemy;
-	SequenceNode n_captureNearestCheckpoint;
-    InverterNode n_runningFromEnemy;
-    InverterNode n_NoEnemyNearTower;
-    LeafNode n_isTowerEmpty;
-    LeafNode n_isEnemyNearTower;
-    LeafNode n_isPlayerClosestWithTower;
-    LeafNode n_isPlayerPowerHigerThanEnemy;
-    LeafNode n_RandomValue;
-	LeafNode n_findNearestCheckpoint;
-	LeafNode n_gotoNearestCheckpoint;
-	LeafNode n_captureCheckpoint;
-	TestNode n_t1_isNotOwned;
-	TestNode n_t1_isNotBeingTargetedByFriendlies;
-	TestNode n_t1_isNoDanger;
-	TestNode n_t2_isNoDanger;
+
+    // Running from enemy node 
+    LeafNode n_GetClosestEnemy;
+    LeafNode n_IsPlayerPowerHigerThanEnemy;
+    LeafNode n_MeetWithDestination;
+    LeafNode n_BackToTowerAction;
+
+    InverterNode n_IsPlayerPowerLowerThanEnemy;
+
+    SelectorNode n_BackToTower;
+
+    SequenceNode n_RunningFromEnemy;
+    // end running
+
+    LeafNode n_IsAlreadyHaveDestination;
+    LeafNode n_GetNearestCheckPoint;
+    LeafNode n_MeetWithDestinationCheckPoint;
+    LeafNode n_GotoCheckPointAction;
+
+    SelectorNode n_SetDestinationCheckpoint;
+    SelectorNode n_GotoCheckPoint;
+
+    SequenceNode n_GotoNearestCheckpoint;
+
+    //Back to tower If Power is critical
+    LeafNode n_CheckIfPowerisCritical;
+
+    SequenceNode n_BackToTowerifPowerIsCritical;
+    //end back
 
 	bool b_isProcessing;
     TowerManagement tm_teamTower;
     GameObject nearestEnemy;
+    GameObject m_destinationCheckpoint;
     Communicator m_communicator;
 
     // Use this for initialization
@@ -49,6 +65,9 @@ public class AgentController : MonoBehaviour {
     {
         CurrentPower = MaxPower;
         b_isPowerDraining = false;
+        currentAction = E_Action.IDLE;
+        m_destinationCheckpoint = null;
+        manager = GameManager.GetInstance();
 
         //register Events
         GameManager.GetInstance().PauseEvent.AddListener(OnPause);
@@ -79,10 +98,15 @@ public class AgentController : MonoBehaviour {
             CurrentPower -= Time.deltaTime;
 
         Action();
-        if (ChaseObject != null && t_goal != ChaseObject.transform.position)
+        switch(currentAction)
         {
-            agent.destination = ChaseObject.transform.position;
-            t_goal = ChaseObject.transform.position;
+            case E_Action.BACK_TO_TOWER:
+                agent.destination = m_teamTower.transform.position;
+                break;
+            case E_Action.GOTO_CHECKPOINT:
+                if(m_destinationCheckpoint != null)
+                    agent.destination = m_destinationCheckpoint.transform.position;
+                break;
         }
     }
 
@@ -110,61 +134,69 @@ public class AgentController : MonoBehaviour {
 
 	protected void DefineNode()
 	{
-		//Leaf nodes
-		n_isTowerEmpty = new LeafNode(IsTowerEmpty);
-		n_isEnemyNearTower = new LeafNode(IsEnemyNearTower);
-		n_isPlayerClosestWithTower = new LeafNode(IsPlayerClosesWithTower);
-		n_isPlayerPowerHigerThanEnemy = new LeafNode(IsPlayerPowerHigerThanEnemy);
-		n_RandomValue = new LeafNode(RandomValue);
-		n_findNearestCheckpoint = new LeafNode(FindNearestCheckpoint);
-		n_gotoNearestCheckpoint = new LeafNode(GotoNearestCheckpoint);
-		n_captureCheckpoint = new LeafNode(CaptureCheckpoint);
+        // RunningFromEnemy
+        n_GetClosestEnemy = new LeafNode(GetClosestEnemy_node);
+        n_IsPlayerPowerHigerThanEnemy = new LeafNode(IsPlayerPowerHigerThanEnemy);
+        n_MeetWithDestination = new LeafNode(MeetWithDestination);
+        n_BackToTowerAction = new LeafNode(BackToTowerAction);
 
-		//Test nodes
-		n_t1_isNoDanger = new TestNode(n_gotoNearestCheckpoint, IsNoDanger);
-		n_t1_isNotBeingTargetedByFriendlies = new TestNode(n_t1_isNoDanger, IsNotBeingTargetedByFriendlies);
-		n_t1_isNotOwned = new TestNode(n_t1_isNotBeingTargetedByFriendlies, IsCheckPointNotOwned);
-		n_t2_isNoDanger = new TestNode(n_captureCheckpoint, IsNoDanger);
+        n_IsPlayerPowerLowerThanEnemy = new InverterNode(n_IsPlayerPowerHigerThanEnemy);
 
-		//Sequence nodes
-		n_backToTower = new SequenceNode(new List<Node>
-		{
-			n_isTowerEmpty,
-			n_isEnemyNearTower,
-			n_isPlayerClosestWithTower
-		});
+        n_BackToTower = new SelectorNode(new List<Node>
+        {
+            n_MeetWithDestination,
+            n_BackToTowerAction
+        });
 
-		//n_lureEnemy = new SequenceNode(new List<Node>
-		//{
-		//    n_RandomValue,
-		//    n_NoEnemyNearTower
-		//});
+        n_RunningFromEnemy = new SequenceNode(new List<Node>
+        {
+            n_GetClosestEnemy,
+            n_IsPlayerPowerLowerThanEnemy,
+            n_BackToTower
+        });
+        //end running
 
-		n_chaseEnemy = new SequenceNode(new List<Node>
-		{
-			n_RandomValue,
-			n_isPlayerPowerHigerThanEnemy
-		});
+        // goto nearest checkpoint
 
-		n_captureNearestCheckpoint = new SequenceNode(new List<Node>
-		{
+        n_IsAlreadyHaveDestination = new LeafNode(IsAlreadyHaveDestination);
+        n_GetNearestCheckPoint = new LeafNode(GetNearestCheckPoint);
+        n_MeetWithDestinationCheckPoint = new LeafNode(MeetWithDestination);
+        n_GotoCheckPointAction = new LeafNode(GotoCheckPointAction);
 
-		});
+        n_SetDestinationCheckpoint = new SelectorNode(new List<Node>
+        {
+            n_IsAlreadyHaveDestination, 
+            n_GetNearestCheckPoint
+        });
+        n_GotoCheckPoint = new SelectorNode(new List<Node>
+        {
+            n_MeetWithDestination,
+            n_GotoCheckPointAction
+        });
 
-		//Inverter nodes
-		n_runningFromEnemy = new InverterNode(n_isPlayerPowerHigerThanEnemy);
-        //n_NoEnemyNearTower = new InverterNode(n_isEnemyNearTower);
+        n_GotoNearestCheckpoint = new SequenceNode(new List<Node>
+        {
+            n_SetDestinationCheckpoint, 
+            n_GotoCheckPoint
+        });
 
-        b_isProcessing = false;
-        tm_teamTower = m_teamTower.GetComponent<TowerManagement>();
+        //end nearest
 
-        //Root
+        //Back to tower if power is critical
+        n_CheckIfPowerisCritical = new LeafNode(CheckIfPowerIsCritical);
+
+        n_BackToTowerifPowerIsCritical = new SequenceNode(new List<Node>()
+        {
+            n_CheckIfPowerisCritical,
+            n_BackToTower
+        });
+        //end back
+
         n_root = new SelectorNode(new List<Node>
         {
-            n_backToTower,
-            n_chaseEnemy,
-            n_runningFromEnemy,
-            //n_lureEnemy
+            n_BackToTowerifPowerIsCritical,
+            n_RunningFromEnemy,
+            n_GotoNearestCheckpoint
         });
     }
 
@@ -177,40 +209,10 @@ public class AgentController : MonoBehaviour {
         }
     }
 
-    // Back to tower -> Sequence
-    Node.NodeState IsTowerEmpty()
-    {
-        if (tm_teamTower.ListPlayerInside.Count == 0)
-            return Node.NodeState.SUCCESS;
-        else
-            return Node.NodeState.FAILED;
-    }
-
-    // Lure enemy -> Inverter
-    // Back to Tower -> Sequence
-    Node.NodeState IsEnemyNearTower()
-    {
-        nearestEnemy = tm_teamTower.GetNearestEnemy();
-        if (nearestEnemy != null)
-            return Node.NodeState.SUCCESS;
-        else
-            return Node.NodeState.FAILED;
-    }
-
-    // Back to Tower -> Sequence
-    Node.NodeState IsPlayerClosesWithTower()
-    {
-        if (tm_teamTower.GetPlayerNearestWithTower() == gameObject)
-            return Node.NodeState.SUCCESS;
-        else
-            return Node.NodeState.FAILED;
-    }
-
     //Chase Enemy -> Selector/ Sequence
     //Running From Enemy -> Inverter
     Node.NodeState IsPlayerPowerHigerThanEnemy()
     {
-        nearestEnemy = tm_teamTower.GetNearestEnemy();
         if (nearestEnemy != null && nearestEnemy.GetComponent<AgentController>() != null)
         {
             if (nearestEnemy.GetComponent<AgentController>().Power <= Power)
@@ -224,6 +226,116 @@ public class AgentController : MonoBehaviour {
         }
     }
 
+    Node.NodeState GetClosestEnemy_node()
+    {
+        if (GetClosestEnemy())
+        {
+            return Node.NodeState.SUCCESS;
+        }
+        else
+        {
+            return Node.NodeState.FAILED;
+        }
+    }
+
+    Node.NodeState MeetWithDestination()
+    {
+        Debug.Log(" MeetWithDestination()");
+        switch (currentAction)
+        {
+            case E_Action.GOTO_CHECKPOINT:
+                if(m_destinationCheckpoint != null)
+                {
+                    Debug.Log(" MeetWithDestination()");
+                    float distanceC = Vector3.Distance(transform.position, m_destinationCheckpoint.transform.position);
+                    if (distanceC <= agent.stoppingDistance)
+                    {
+                        m_destinationCheckpoint = null;
+                        return Node.NodeState.SUCCESS;
+                    }
+                }
+                break;
+            case E_Action.BACK_TO_TOWER:
+                float distance = Vector3.Distance(transform.position, m_teamTower.transform.position);
+                if(distance <= agent.stoppingDistance)
+                {
+                    return Node.NodeState.SUCCESS;
+                }
+                break;
+        }
+
+        return Node.NodeState.FAILED;
+    }
+
+    Node.NodeState BackToTowerAction()
+    {
+        Debug.Log("Back to tower action");
+        currentAction = E_Action.BACK_TO_TOWER;
+        m_communicator.DeleteMessage(gameObject);
+        return Node.NodeState.RUNNING;
+    }
+    /////
+
+
+    Node.NodeState IsAlreadyHaveDestination()
+    {
+        Debug.Log("IsAlreadyHaveDestination()");
+        if(m_destinationCheckpoint != null)
+        {
+            return Node.NodeState.SUCCESS;
+        }
+        else
+        {
+            return Node.NodeState.FAILED;
+        }
+    }
+
+    Node.NodeState GetNearestCheckPoint()
+    {
+       
+        List<Communicator.Message> checkpointMassage = m_communicator.Find(Communicator.Message.CommunicationType.GOTO_CHECKPOINT);
+
+        GameObject nearestCheckpoint = null;
+        float nearestDistance = 0;
+
+        foreach(GameObject ch in manager.CheckPoints)
+        {
+            CheckPointEngine check = ch.GetComponent<CheckPointEngine>();
+            if (check != null && check.TeamOwner != Team)
+            {
+                Communicator.Message ch_obj = checkpointMassage.Find(x => x.target == ch);
+                if (checkpointMassage.IndexOf(ch_obj) < 0)
+                {
+                    float distance = Vector3.Distance(transform.position, ch.transform.position);
+                    if (nearestDistance == 0 || nearestDistance > distance)
+                    {
+                        nearestDistance = distance;
+                        nearestCheckpoint = ch;
+                    }
+                }
+            }
+        }
+
+        if(nearestCheckpoint != null)
+        {
+            
+            m_destinationCheckpoint = nearestCheckpoint;
+            m_communicator.AddMessage(gameObject, nearestCheckpoint, Communicator.Message.CommunicationType.GOTO_CHECKPOINT);
+            return Node.NodeState.SUCCESS;
+        }
+        else
+        {
+            return Node.NodeState.FAILED;
+        }
+    }
+
+    Node.NodeState GotoCheckPointAction()
+    {
+        Debug.Log("Goto checkpoint");
+        currentAction = E_Action.GOTO_CHECKPOINT;
+        return Node.NodeState.RUNNING;
+    }
+
     Node.NodeState RandomValue()
     {
         float randomValue = Random.value;
@@ -233,76 +345,64 @@ public class AgentController : MonoBehaviour {
             return Node.NodeState.FAILED;
     }
 
-    Node.NodeState GetClosestEnemy_node()
+    Node.NodeState DeleteAllAction()
     {
-		if(GetClosestEnemy() != null)
-		{
-			return Node.NodeState.SUCCESS;
-		}
-		else
-		{
-			return Node.NodeState.FAILED;
-		}
-	}
+        currentAction = E_Action.IDLE;
+        return Node.NodeState.SUCCESS;
+    }
 
-	GameObject GetClosestEnemy()
+    //Back to tower if power is critical
+    Node.NodeState CheckIfPowerIsCritical()
+    {
+        if(Power < 100)
+        {
+            return Node.NodeState.SUCCESS;
+        }
+        else
+        {
+            return Node.NodeState.FAILED;
+        }
+    }
+
+	bool GetClosestEnemy()
 	{
 		Collider[] objects = Physics.OverlapSphere(transform.position, RangeToFindEnemy);
 
 		if (objects.Length > 0)
 		{
-			GameObject closestEnemy = null;
-			float closestDistance = 0;
-			List<Communicator.Message> messages = m_communicator.Find(Communicator.Message.CommunicationType.CHASE_ENEMY);
-			for (int i = 0; i < objects.Length; i++)
-			{
-				Communicator.Message obj = messages.Find(x => x.agent == objects[i].gameObject);
-				if (messages.IndexOf(obj) < 0)
-				{
-					float distance = Vector3.Distance(transform.position, objects[i].transform.position);
-					if (closestDistance > 0 && closestDistance > distance)
-					{
-						closestEnemy = objects[i].gameObject;
-						closestDistance = distance;
-					}
-				}
-			}
+            
+            GameObject closestEnemy = null;
+            float closestDistance = 0;
+			foreach(Collider col in objects)
+            {
+                if (col.tag == "Player")
+                {
+                    
+                    AgentController control = col.GetComponent<AgentController>();
+                    if (control == null)
+                        continue;
+                    if (control.Team == Team)
+                        continue;
+                    Debug.Log("musuh ni");
+                    float dist = Vector3.Distance(col.gameObject.transform.position, transform.position);
+                    if (closestDistance < dist)
+                    {
+                        closestEnemy = col.gameObject;
+                        closestDistance = dist;
+                    }
+                }
+            }
 			nearestEnemy = closestEnemy;
-			return nearestEnemy;
+            if (nearestEnemy != null)
+                return true;
+            else
+                return false;
 		}
-		return null;
+		return false;
 	}
 
-	Node.NodeState FindNearestCheckpoint()
-	{
+	
 
-	}
-
-	Node.NodeState GotoNearestCheckpoint()
-	{
-
-	}
-
-	Node.NodeState CaptureCheckpoint()
-	{
-
-	}
-
-	//Test method bodies
-	bool IsNoDanger()
-	{
-
-	}
-
-	bool IsCheckPointNotOwned()
-	{
-
-	}
-
-	bool IsNotBeingTargetedByFriendlies()
-	{
-
-	}
 
 	IEnumerator EvaluateBehaviour()
     {
@@ -310,26 +410,7 @@ public class AgentController : MonoBehaviour {
 
         n_root.Evaluate();
 
-        if (n_backToTower.state == Node.NodeState.SUCCESS)
-        {
-            Debug.Log("Back to tower");
-            ChaseObject = tm_teamTower.TeamSpawn.gameObject;
-        }
-        else if (n_chaseEnemy.state == Node.NodeState.SUCCESS)
-        {
-            Debug.Log("Chase enemy");
-            ChaseObject = nearestEnemy;
-        }
-        else if (n_runningFromEnemy.state == Node.NodeState.SUCCESS)
-        {
-            Debug.Log("Running from enemy");
-            ChaseObject = tm_teamTower.TeamSpawn.gameObject;
-        }
-        //else if (n_lureEnemy.state == Node.NodeState.SUCCESS)
-        //{
-        //    Debug.Log("Lure enemy");
-        //    ChaseObject = m_enemyTower;
-        //}
+      
         b_isProcessing = false;
     }
 

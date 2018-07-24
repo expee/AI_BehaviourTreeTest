@@ -21,6 +21,11 @@ public class Communicator : MonoBehaviour {
 		public GameObject target { get; private set; }
 	}
 
+    private void Start()
+    {
+        messages = new List<Message>();   
+    }
+
     public void AddMessage(GameObject agent, GameObject target, Message.CommunicationType type)
     {
         Message message = new Message(agent, target, type);
@@ -30,14 +35,19 @@ public class Communicator : MonoBehaviour {
     public void DeleteMessage(GameObject agent)
     {
         Message message = messages.Find(x => x.agent == agent);
-
-        messages.Remove(message);
+        if(messages.IndexOf(message) > -1)
+            messages.Remove(message);
     }
 
 	public List<Message> Find(Message.CommunicationType type)
 	{
 		return messages.FindAll(x => x.type == type);
 	}
+
+    public List<Message> Find(GameObject target)
+    {
+        return messages.FindAll(x => x.target == target);
+    }
 
 	public List<Message> messages { get; private set; }
 }
