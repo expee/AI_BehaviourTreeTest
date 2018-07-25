@@ -9,7 +9,7 @@ public class AgentController : MonoBehaviour {
     protected enum E_Action {IDLE, BACK_TO_TOWER, GOTO_CHECKPOINT, ACTION_COUNT}
 
     public GameManager.Team Team;
-    public float MaxPower = 1000;
+    public float MaxPower = 10;
     public float RangeToFindEnemy = 10f;
     public GameObject TeamTower;
 
@@ -170,7 +170,7 @@ public class AgentController : MonoBehaviour {
         });
         n_GotoCheckPoint = new SelectorNode(new List<Node>
         {
-            n_MeetWithDestination,
+            n_MeetWithDestinationCheckPoint,
             n_GotoCheckPointAction
         });
 
@@ -354,7 +354,7 @@ public class AgentController : MonoBehaviour {
     //Back to tower if power is critical
     Node.NodeState CheckIfPowerIsCritical()
     {
-        if(Power < 100)
+        if(Power < 2)
         {
             return Node.NodeState.SUCCESS;
         }
