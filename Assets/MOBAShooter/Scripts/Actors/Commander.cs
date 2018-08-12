@@ -161,7 +161,7 @@ public class Commander : Actor
 
     bool IsMagazineNotEmpty()
     {
-        return false
+        return false;
     }
     #endregion
     
