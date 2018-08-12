@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 namespace Locomotion
 {
+    [RequireComponent(typeof(NavMeshAgent))]
 	public class BotGait : MonoBehaviour
 	{
         public enum LocomotionState
@@ -44,21 +45,25 @@ namespace Locomotion
             {
                 state = LocomotionState.ARRIVED;
                 _nmAgent.ResetPath();
+                tgtPos = Vector3.zero;
                 return state;
             }
             else if (_nmAgent.pathStatus == NavMeshPathStatus.PathInvalid || _nmAgent.pathStatus == NavMeshPathStatus.PathPartial)
             {
                 state = LocomotionState.BLOCKED;
+                tgtPos = Vector3.zero;
                 return state;
             }
             else if(_nmAgent.velocity.magnitude == 0 && !_nmAgent.hasPath)
             {
                 state = LocomotionState.IDLE;
+                tgtPos = Vector3.zero;
                 return state;
             }
             else
             {
                 state = LocomotionState.IDLE;
+                tgtPos = Vector3.zero;
                 return state;
             }
         }

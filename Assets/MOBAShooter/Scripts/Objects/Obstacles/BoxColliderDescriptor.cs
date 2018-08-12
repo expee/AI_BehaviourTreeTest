@@ -51,10 +51,10 @@ namespace Obstacle
             Vector3 lowerLeft = -_rotatedExtentX + -_rotatedExtentZ;
             Vector3 lowerRight = _rotatedExtentX + -_rotatedExtentZ;
 
-            xzBoundaries[0] = (new Vector2(_center.x + upperLeft.x, _center.z + upperLeft.z));  //UpperLeft
-            xzBoundaries[1] = (new Vector2(_center.x + upperRight.x, _center.z + upperRight.z));  //UpperRight
-            xzBoundaries[2] = (new Vector2(_center.x + lowerLeft.x, _center.z + lowerLeft.z));  //LowerLeft
-            xzBoundaries[3] = (new Vector2(_center.x + lowerRight.x, _center.z + lowerRight.z));  //LowerRight
+            xzBoundaries[0] = (new Vector2(_center.x + upperLeft.x, _center.z + upperLeft.z));      //UpperLeft
+            xzBoundaries[1] = (new Vector2(_center.x + upperRight.x, _center.z + upperRight.z));    //UpperRight
+            xzBoundaries[2] = (new Vector2(_center.x + lowerLeft.x, _center.z + lowerLeft.z));      //LowerLeft
+            xzBoundaries[3] = (new Vector2(_center.x + lowerRight.x, _center.z + lowerRight.z));    //LowerRight
         }
 
         public List<Vector2> xzBoundaries { get; private set; }
