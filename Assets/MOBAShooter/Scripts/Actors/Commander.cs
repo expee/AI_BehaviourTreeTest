@@ -15,6 +15,7 @@ public class Commander : Actor
     private Vector3 _coverSpot;
     private Vector3 _standingSpot;
     private bool _isInCover;
+    private bool _isFiring;
 
     private bool _targetingCoverOrStandingSpot; //true = cover spot; false = standing spot
     private void Awake()
@@ -26,8 +27,8 @@ public class Commander : Actor
 
     private void Start ()
     {
-        //Reset suppresion, there's no point keeping it suppressed upon re-activation
-        suppresion = 0;
+        //Reset suppression, there's no point keeping it suppressed upon re-activation
+        suppression = 0;
 	}
 	
 	private void Update ()
@@ -72,6 +73,8 @@ public class Commander : Actor
         }
         else if(locoState == Locomotion.BotGait.LocomotionState.ARRIVED)
         {
+            if (_targetingCoverOrStandingSpot)
+                _isInCover = true;
             return Node.NodeState.SUCCESS;
         }
         else
@@ -128,15 +131,43 @@ public class Commander : Actor
             return Node.NodeState.FAILED;
         }
     }
+
     Node.NodeState RandomlyTryToPickNewCover()
     {
         return Node.NodeState.FAILED;
     }
     #endregion
 
+    #region Test Nodes
+    bool IsNotInCover()
+    {
+        return !_isInCover;
+    }
+
+    bool IsEnemyPresent()
+    {
+        return false;
+    }
+
+    bool IsNotFiring()
+    {
+        return !_isFiring;
+    }
+
+    bool IsNotSuppressed()
+    {
+        return suppression > 0;
+    }
+
+    bool IsMagazineNotEmpty()
+    {
+        return false
+    }
+    #endregion
+    
     #region Properties
     public int bravery { get; set; }
-    public int suppresion { get; private set; }
+    public int suppression { get; private set; }
     public int accuracy { get; set; }
     public bool isCharacteristicSet { get; private set; }
     #endregion
