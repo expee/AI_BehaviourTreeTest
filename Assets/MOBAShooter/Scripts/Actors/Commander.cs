@@ -21,6 +21,8 @@ public class Commander : Actor
     private bool _isFiring;
     private List<Commander> _enemies;
 
+    private Vector3 cornerA;
+    private Vector3 cornerB;
     private bool _targetingCoverOrStandingSpot; //true = cover spot; false = standing spot
 
     private void Awake()
@@ -62,7 +64,7 @@ public class Commander : Actor
         _run = new LeafNode(Run);
         _pickNearestCover = new LeafNode(RandomlyTryToPickNewCover);
         _alreadyHasCover = new LeafNode(AlreadyHasCover);
-        _checkCoverPicked = new SelectorNode(new List<Node> { _pickNearestCover });
+        _checkCoverPicked = new SelectorNode(new List<Node> { _alreadyHasCover, _pickNearestCover });
         _goToNearestCover = new SequenceNode(new List<Node> { _checkCoverPicked, _run});
         _rootNode = new SelectorNode(new List<Node> { _goToNearestCover});
     }
@@ -257,27 +259,35 @@ public class Commander : Actor
     {
         Vector3 corner1 = Vector3.zero;
         Vector3 corner2 = Vector3.zero;
-        float farthestDist = 0;
+        float farthestDist1 = 0;
+        float farthestDist2 = 0;
         int turn = 0;
         for(int i = 0; i < obstacle.xzBoundaries.Count; i++)
         {
             float dist = Vector3.Distance(enemy.transformRef.position, new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y));
-            if(dist > farthestDist)
+            if (turn == 0)
             {
-                farthestDist = dist;
-                if (turn == 0)
+                if (dist > farthestDist1)
                 {
+                    farthestDist1 = dist;
                     corner1 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
                     turn = 1;
                 }
-                else
+            }
+            else
+            {
+                if (dist > farthestDist2)
                 {
+                    farthestDist2 = dist;
                     corner2 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
                     turn = 0;
                 }
             }
+
         }
         Vector3 faceMidPoint = corner2 + (corner1 - corner2) / 2;
+        cornerA = corner1;
+        cornerB = corner2;
         return faceMidPoint;
     }
     #endregion
@@ -299,6 +309,13 @@ public class Commander : Actor
             Gizmos.DrawLine(transformRef.position, _coverSpot);
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(_coverSpot, .5f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(_selectedCover.transformRef.position, 5f);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(cornerA, .5f);
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(cornerB, .5f);
+
         }
     }
     #endregion
