@@ -36,7 +36,12 @@ namespace Locomotion
 
         public LocomotionState CheckLocomotionState()
         {
-            if(_nmAgent.velocity.magnitude != 0 && _nmAgent.remainingDistance > _nmAgent.stoppingDistance)
+            if(_nmAgent.pathPending)
+            {
+                state = LocomotionState.MOVING;
+                return state;
+            }
+            else if(_nmAgent.velocity.magnitude != 0 && _nmAgent.remainingDistance > _nmAgent.stoppingDistance)
             {
                 state = LocomotionState.MOVING;
                 return state;

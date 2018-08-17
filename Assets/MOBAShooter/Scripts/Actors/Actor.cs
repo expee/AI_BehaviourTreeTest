@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Actor : MonoBehaviour {
+public class Actor : MonoBehaviour
+{
+    public enum Allegiance
+    {
+        RED,
+        BLUE,
+        ALLEGIANCE_COUNT
+    }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public enum State
+    {
+        ALIVE,
+        DEAD,
+        STATE_COUNT
+    }
+    public Allegiance allegiance;
+
+    public State state { get; protected set; }
 }

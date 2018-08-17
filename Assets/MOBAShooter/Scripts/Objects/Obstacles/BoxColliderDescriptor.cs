@@ -15,7 +15,12 @@ namespace Obstacle
         private Vector3 _rotatedExtentX;
         private Vector3 _rotatedExtentY;
         private Vector3 _rotatedExtentZ;
-        
+
+        private void Awake()
+        {
+            transformRef = GetComponent<Transform>();
+        }
+
         void Start()
         {
             xzBoundaries = new List<Vector2>();
@@ -58,5 +63,7 @@ namespace Obstacle
         }
 
         public List<Vector2> xzBoundaries { get; private set; }
+        public Transform transformRef { get; private set; }
+        public bool isOccupied { get; set; }
     }
 }

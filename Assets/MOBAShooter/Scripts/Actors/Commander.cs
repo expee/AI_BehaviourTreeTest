@@ -1,34 +1,52 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Commander : Actor
 {
     private SelectorNode _rootNode;
-
-
     private LeafNode _run;
     private LeafNode _celebrate;
-
+    private LeafNode _alreadyHasCover;
+    private LeafNode _pickNearestCover;
+    private SequenceNode _goToNearestCover;
+    private SelectorNode _checkCoverPicked;
 
     private Locomotion.BotGait _gait;
 
-    private GameObject _selectedCover;
+    private Obstacle.BoxColliderDescriptor _selectedCover;
     private Vector3 _coverSpot;
     private Vector3 _standingSpot;
+
     private bool _isInCover;
     private bool _isFiring;
+    private List<Commander> _enemies;
 
     private bool _targetingCoverOrStandingSpot; //true = cover spot; false = standing spot
+
     private void Awake()
     {
+        transformRef = GetComponent<Transform>();
         _gait = GetComponent<Locomotion.BotGait>();
+        _enemies = new List<Commander>();
         CreateBehaviourTree();
-        ResetCharacteristic();
+        SetCharacteristic(1,1);
     }
 
     private void Start ()
     {
+        state = State.ALIVE;
         //Reset suppression, there's no point keeping it suppressed upon re-activation
         suppression = 0;
+
+        GameObject[] botList = GameObject.FindGameObjectsWithTag("Bot");
+        for(int i = 0; i < botList.Length; i++)
+        {
+            Commander bot = botList[i].GetComponent<Commander>();
+            if (allegiance != bot.allegiance)
+            {
+                _enemies.Add(bot);
+            }
+        }
 	}
 	
 	private void Update ()
@@ -41,7 +59,12 @@ public class Commander : Actor
 
     private void CreateBehaviourTree()
     {
-
+        _run = new LeafNode(Run);
+        _pickNearestCover = new LeafNode(RandomlyTryToPickNewCover);
+        _alreadyHasCover = new LeafNode(AlreadyHasCover);
+        _checkCoverPicked = new SelectorNode(new List<Node> { _pickNearestCover });
+        _goToNearestCover = new SequenceNode(new List<Node> { _checkCoverPicked, _run});
+        _rootNode = new SelectorNode(new List<Node> { _goToNearestCover});
     }
 
     public void SetCharacteristic(int inBravery, int inAccuracy)
@@ -61,11 +84,6 @@ public class Commander : Actor
     #region Action Nodes
     Node.NodeState Run()
     {
-        if(_targetingCoverOrStandingSpot) //targeting cover spot
-            _gait.SetBotDestination(_coverSpot);
-        else //targeting standing spot
-            _gait.SetBotDestination(_standingSpot);
-
         Locomotion.BotGait.LocomotionState locoState = _gait.CheckLocomotionState();
         if(locoState == Locomotion.BotGait.LocomotionState.MOVING)
         {
@@ -73,7 +91,7 @@ public class Commander : Actor
         }
         else if(locoState == Locomotion.BotGait.LocomotionState.ARRIVED)
         {
-            if (_targetingCoverOrStandingSpot)
+            if (Vector3.Distance(transformRef.position, _coverSpot) <= 0.05f)
                 _isInCover = true;
             return Node.NodeState.SUCCESS;
         }
@@ -93,7 +111,11 @@ public class Commander : Actor
 
     Node.NodeState PickNearestCover()
     {
-        return Node.NodeState.FAILED;
+        LeaveLastCover();
+        FindNearestCover();
+        PickCoverSpot();
+        _gait.SetBotDestination(new Vector2(_coverSpot.x, _coverSpot.z));
+        return Node.NodeState.SUCCESS;
     }
 
     Node.NodeState HasStandingSpot()
@@ -106,6 +128,7 @@ public class Commander : Actor
 
     Node.NodeState PickStandingSpot()
     {
+        _gait.SetBotDestination(_standingSpot);
         return Node.NodeState.FAILED;
     }
 
@@ -134,7 +157,11 @@ public class Commander : Actor
 
     Node.NodeState RandomlyTryToPickNewCover()
     {
-        return Node.NodeState.FAILED;
+        LeaveLastCover();
+        FindRandomCover();
+        PickCoverSpot();
+        _gait.SetBotDestination(new Vector2(_coverSpot.x, _coverSpot.z));
+        return Node.NodeState.SUCCESS;
     }
     #endregion
 
@@ -164,11 +191,115 @@ public class Commander : Actor
         return false;
     }
     #endregion
-    
+
+    #region Aux Methods
+    private void LeaveLastCover()
+    {
+        if (_selectedCover != null)
+            _selectedCover.isOccupied = false;
+        _selectedCover = null;
+    }
+
+    private void FindNearestCover()
+    {
+        float nearestDist = float.MaxValue;
+        foreach (Obstacle.BoxColliderDescriptor cover in Game.Instance.covers)
+        {
+            float dist = Vector3.Distance(cover.transformRef.position, transformRef.position);
+            if (dist < nearestDist && cover.isOccupied == false)
+            {
+                nearestDist = dist;
+                _selectedCover = cover;
+            }
+        }
+        _selectedCover.isOccupied = true;
+    }
+
+    private void FindRandomCover()
+    {
+        int trial = 0;
+        do
+        {
+            int randomIdx = Random.Range(0, Game.Instance.covers.Count);
+            if (!Game.Instance.covers[randomIdx].isOccupied)
+                _selectedCover = Game.Instance.covers[randomIdx];
+        } while (_selectedCover == null || ++trial < Game.Instance.covers.Count);
+
+        if (_selectedCover != null)
+            _selectedCover.isOccupied = true;
+    }
+
+    private void PickCoverSpot()
+    {
+        Commander nearestEnemy = FindNearestEnemy();
+        Vector3 enemyDir = (nearestEnemy.transformRef.position - transformRef.position).normalized;
+        Vector3 tgtFace = FindFarthestFace(nearestEnemy, _selectedCover);
+        _coverSpot = tgtFace + -enemyDir;
+    }
+
+    private Commander FindNearestEnemy()
+    {
+        float nearestDist = float.MaxValue;
+        Commander nearestEnemy = null;
+        for(int i = 0; i <  _enemies.Count; i++)
+        {
+            float dist = Vector3.Distance(_enemies[i].transformRef.position, transformRef.position);
+            if(dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearestEnemy = _enemies[i];
+            }
+        }
+        return nearestEnemy;
+    }
+
+    private Vector3 FindFarthestFace(Commander enemy, Obstacle.BoxColliderDescriptor obstacle)
+    {
+        Vector3 corner1 = Vector3.zero;
+        Vector3 corner2 = Vector3.zero;
+        float farthestDist = 0;
+        int turn = 0;
+        for(int i = 0; i < obstacle.xzBoundaries.Count; i++)
+        {
+            float dist = Vector3.Distance(enemy.transformRef.position, new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y));
+            if(dist > farthestDist)
+            {
+                farthestDist = dist;
+                if (turn == 0)
+                {
+                    corner1 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
+                    turn = 1;
+                }
+                else
+                {
+                    corner2 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
+                    turn = 0;
+                }
+            }
+        }
+        Vector3 faceMidPoint = corner2 + (corner1 - corner2) / 2;
+        return faceMidPoint;
+    }
+    #endregion
+
     #region Properties
     public int bravery { get; set; }
     public int suppression { get; private set; }
     public int accuracy { get; set; }
     public bool isCharacteristicSet { get; private set; }
+    public Transform transformRef { get; private set; }
+    #endregion
+
+    #region Debug
+    private void OnDrawGizmos()
+    {
+        if(_coverSpot != Vector3.zero)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transformRef.position, _coverSpot);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(_coverSpot, .5f);
+        }
+    }
     #endregion
 }
