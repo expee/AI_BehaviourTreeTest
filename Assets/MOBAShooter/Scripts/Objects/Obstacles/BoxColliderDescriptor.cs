@@ -65,10 +65,14 @@ namespace Obstacle
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireCube(new Vector3(xzBoundaries[0].x, transformRef.position.y, xzBoundaries[0].y), Vector3.one * .5f);
-            Gizmos.DrawWireCube(new Vector3(xzBoundaries[1].x, transformRef.position.y, xzBoundaries[1].y), Vector3.one * .5f);
-            Gizmos.DrawWireCube(new Vector3(xzBoundaries[2].x, transformRef.position.y, xzBoundaries[2].y), Vector3.one * .5f);
-            Gizmos.DrawWireCube(new Vector3(xzBoundaries[3].x, transformRef.position.y, xzBoundaries[3].y), Vector3.one * .5f);
+            if(xzBoundaries != null)
+            {
+                Gizmos.DrawWireCube(new Vector3(xzBoundaries[0].x, transformRef.position.y, xzBoundaries[0].y), Vector3.one * .5f);
+                Gizmos.DrawWireCube(new Vector3(xzBoundaries[1].x, transformRef.position.y, xzBoundaries[1].y), Vector3.one * .5f);
+                Gizmos.DrawWireCube(new Vector3(xzBoundaries[2].x, transformRef.position.y, xzBoundaries[2].y), Vector3.one * .5f);
+                Gizmos.DrawWireCube(new Vector3(xzBoundaries[3].x, transformRef.position.y, xzBoundaries[3].y), Vector3.one * .5f);
+
+            }
 
         }
         public List<Vector2> xzBoundaries { get; private set; }

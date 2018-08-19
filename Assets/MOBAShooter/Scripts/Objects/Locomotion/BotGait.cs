@@ -38,16 +38,19 @@ namespace Locomotion
         {
             if(_nmAgent.pathPending)
             {
+                //Debug.Log(name + "Path Pending");
                 state = LocomotionState.MOVING;
                 return state;
             }
-            else if(_nmAgent.velocity.magnitude != 0 && _nmAgent.remainingDistance > _nmAgent.stoppingDistance)
+            else if(_nmAgent.velocity.magnitude != 0 || _nmAgent.remainingDistance > _nmAgent.stoppingDistance)
             {
+                //Debug.Log(name + "Is Moving");
                 state = LocomotionState.MOVING;
                 return state;
             }
             else if(_nmAgent.velocity.magnitude == 0 && _nmAgent.remainingDistance <= _nmAgent.stoppingDistance)
             {
+                //Debug.Log(name + "Is Arrived at destination");
                 state = LocomotionState.ARRIVED;
                 _nmAgent.ResetPath();
                 tgtPos = Vector3.zero;
@@ -55,18 +58,21 @@ namespace Locomotion
             }
             else if (_nmAgent.pathStatus == NavMeshPathStatus.PathInvalid || _nmAgent.pathStatus == NavMeshPathStatus.PathPartial)
             {
+                //Debug.Log(name + "Is blocked");
                 state = LocomotionState.BLOCKED;
                 tgtPos = Vector3.zero;
                 return state;
             }
             else if(_nmAgent.velocity.magnitude == 0 && !_nmAgent.hasPath)
             {
+                //Debug.Log(name + "Doesn't has path");
                 state = LocomotionState.IDLE;
                 tgtPos = Vector3.zero;
                 return state;
             }
             else
             {
+                //Debug.Log(name + "Just Idling");
                 state = LocomotionState.IDLE;
                 tgtPos = Vector3.zero;
                 return state;
