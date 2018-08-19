@@ -32,7 +32,10 @@ namespace Gun
 		{
 			if(!magazineEmpty && _ammoInReceiver)
 			{
-				Instantiate(bullet, muzzle.transform.position, muzzle.transform.rotation);
+                Vector2 randomCircle = Random.insideUnitCircle * inherentAccuracy;
+                Vector3 randomCone = new Vector3(randomCircle.x, randomCircle.y, 10.0f);
+				Bullet ejectedAmmo = Instantiate(bullet, muzzle.transform.position, muzzle.transform.rotation);
+                ejectedAmmo.gameObject.transform.LookAt(transform.TransformPoint(randomCone));
 				ammoRemaining--;
 				magazineEmpty = ammoRemaining == 0 ? true : false;
 				_ammoInReceiver = false;

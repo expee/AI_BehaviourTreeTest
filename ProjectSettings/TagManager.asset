@@ -7,6 +7,9 @@ TagManager:
   - Environment
   - Obstacle
   - Bot
+  - BotBody
+  - Enemy
+  - Bolt
   layers:
   - Default
   - TransparentFX

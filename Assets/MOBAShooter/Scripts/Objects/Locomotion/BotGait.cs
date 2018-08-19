@@ -34,6 +34,16 @@ namespace Locomotion
             _nmAgent.SetDestination(tgtPos);
         }
 
+        public void DisableNavMesh()
+        {
+            _nmAgent.enabled = false;
+        }
+
+        public void EnableNavMesh()
+        {
+            _nmAgent.enabled = true;
+        }
+
         public LocomotionState CheckLocomotionState()
         {
             if(_nmAgent.pathPending)

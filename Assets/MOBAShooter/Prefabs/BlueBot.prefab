@@ -4913,6 +4913,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allegiance: 1
+  maxHealth: 100
   gun: {fileID: 114951481940430634}
 --- !u!114 &114951481940430634
 MonoBehaviour:

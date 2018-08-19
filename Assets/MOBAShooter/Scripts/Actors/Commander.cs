@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Commander : Actor
 {
+    public int maxHealth;
     public Gun.Assembly gun;
 
     private LeafNode _run;
@@ -47,7 +48,7 @@ public class Commander : Actor
     private bool _isInCover;
     private bool _isFiring;
     private List<Commander> _enemies;
-
+    private Rigidbody _rigidbody;
     private Vector3 cornerA;
     private Vector3 cornerB;
 
@@ -56,8 +57,9 @@ public class Commander : Actor
         transformRef = GetComponent<Transform>();
         _gait = GetComponent<Locomotion.BotGait>();
         _enemies = new List<Commander>();
+        _rigidbody = GetComponent<Rigidbody>();
         CreateBehaviourTree();
-        SetCharacteristic(1,1);
+        SetCharacteristic(1,Random.Range(0.2f, 0.8f));
     }
 
     private void Start ()
@@ -65,7 +67,7 @@ public class Commander : Actor
         state = State.ALIVE;
         //Reset suppression, there's no point keeping it suppressed upon re-activation
         suppression = 100;
-
+        health = maxHealth;
         GameObject[] botList = GameObject.FindGameObjectsWithTag("Bot");
         for(int i = 0; i < botList.Length; i++)
         {
@@ -81,7 +83,7 @@ public class Commander : Actor
 	
 	private void Update ()
     {
-        if (isCharacteristicSet)
+        if (isCharacteristicSet && state == State.ALIVE)
             _rootNode.Evaluate();
         //else
         //    //Debug.LogError("ERROR!! Characteristics for " + gameObject.name + " haven't been set");
@@ -126,7 +128,7 @@ public class Commander : Actor
         _rootNode         = new SelectorNode(new List<Node> { _isEnemyPresent, _celebrate });
     }
 
-    public void SetCharacteristic(int inBravery, int inAccuracy)
+    public void SetCharacteristic(int inBravery, float inAccuracy)
     {
         bravery = inBravery;
         accuracy = inAccuracy;
@@ -247,8 +249,9 @@ public class Commander : Actor
     Node.NodeState AimAndFire()
     {
         //Debug.Log(name + " FIRING");
+        Vector2 randomCircle = Random.insideUnitCircle * accuracy;
         Commander nearestEnemy = FindNearestEnemy();
-        transformRef.LookAt(nearestEnemy.transformRef);
+        transformRef.LookAt(nearestEnemy.transformRef.position + transformRef.localRotation * new Vector3(randomCircle.x, randomCircle.y, 0.0f));
         gun.Fire();
         _isFiring = true;
         return Node.NodeState.FAILED;
@@ -523,12 +526,32 @@ public class Commander : Actor
     {
         gun.SetFireMode(Gun.Trigger.FireMode.AUTO);
     }
+
+    public void UpdateHealth(int amount)
+    {
+        Debug.Log(name + " Updating Health " + amount);
+        health += amount;
+        if(health <= 0)
+        {
+            state = State.DEAD;
+            _gait.DisableNavMesh();
+            _rigidbody.isKinematic = false;
+            _rigidbody.AddForce(Vector3.left + Vector3.down, ForceMode.Impulse);
+
+        }
+    }
     #endregion
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag == "Bolt")
+            UpdateHealth(-10);
+    }
     #region Properties
+    public int health { get; private set; }
     public int bravery { get; set; }
     public int suppression { get; private set; }
-    public int accuracy { get; set; }
+    public float accuracy { get; set; }
     public bool isCharacteristicSet { get; private set; }
     public Transform transformRef { get; private set; }
     #endregion
@@ -542,8 +565,8 @@ public class Commander : Actor
             Gizmos.DrawLine(transformRef.position, _coverSpot);
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(_coverSpot, .5f);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(_selectedCover.transformRef.position, 5f);
+            //Gizmos.color = Color.blue;
+            //Gizmos.DrawWireSphere(_selectedCover.transformRef.position, 5f);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(cornerA, .5f);
             Gizmos.color = Color.white;
