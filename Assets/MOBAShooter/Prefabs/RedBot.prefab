@@ -2760,7 +2760,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1175326740131400}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 42, y: 0, z: 36.4}
+  m_LocalPosition: {x: 44.54, y: 0, z: 18.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4659010209361122}
@@ -4933,6 +4933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allegiance: 0
+  gun: {fileID: 114290760939599852}
 --- !u!136 &136169427130430720
 CapsuleCollider:
   m_ObjectHideFlags: 1

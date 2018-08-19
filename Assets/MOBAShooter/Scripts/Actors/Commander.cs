@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Commander : Actor
 {
+    public Gun.Assembly gun;
+
     private SelectorNode _rootNode;
     private LeafNode _run;
     private LeafNode _celebrate;
@@ -49,6 +51,8 @@ public class Commander : Actor
                 _enemies.Add(bot);
             }
         }
+
+        PrepareGun();
 	}
 	
 	private void Update ()
@@ -64,7 +68,7 @@ public class Commander : Actor
         _run = new LeafNode(Run);
         _pickNearestCover = new LeafNode(RandomlyTryToPickNewCover);
         _alreadyHasCover = new LeafNode(AlreadyHasCover);
-        _checkCoverPicked = new SelectorNode(new List<Node> { _alreadyHasCover, _pickNearestCover });
+        _checkCoverPicked = new SelectorNode(new List<Node> { _pickNearestCover });
         _goToNearestCover = new SequenceNode(new List<Node> { _checkCoverPicked, _run});
         _rootNode = new SelectorNode(new List<Node> { _goToNearestCover});
     }
@@ -175,7 +179,8 @@ public class Commander : Actor
 
     bool IsEnemyPresent()
     {
-        return false;
+        _enemies.RemoveAll(en => en.state == State.DEAD);
+        return _enemies.Count > 0;
     }
 
     bool IsNotFiring()
@@ -261,27 +266,22 @@ public class Commander : Actor
         Vector3 corner2 = Vector3.zero;
         float farthestDist1 = 0;
         float farthestDist2 = 0;
-        int turn = 0;
         for(int i = 0; i < obstacle.xzBoundaries.Count; i++)
         {
             float dist = Vector3.Distance(enemy.transformRef.position, new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y));
-            if (turn == 0)
+
+            if (dist > farthestDist1)
             {
-                if (dist > farthestDist1)
-                {
-                    farthestDist1 = dist;
-                    corner1 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
-                    turn = 1;
-                }
+                farthestDist2 = farthestDist1;
+                farthestDist1 = dist;
+                corner2 = corner1;
+                corner1 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
             }
-            else
+
+            else if (dist > farthestDist2)
             {
-                if (dist > farthestDist2)
-                {
-                    farthestDist2 = dist;
-                    corner2 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
-                    turn = 0;
-                }
+                farthestDist2 = dist;
+                corner2 = new Vector3(obstacle.xzBoundaries[i].x, enemy.transformRef.position.y, obstacle.xzBoundaries[i].y);
             }
 
         }
@@ -289,6 +289,11 @@ public class Commander : Actor
         cornerA = corner1;
         cornerB = corner2;
         return faceMidPoint;
+    }
+
+    private void PrepareGun()
+    {
+
     }
     #endregion
 

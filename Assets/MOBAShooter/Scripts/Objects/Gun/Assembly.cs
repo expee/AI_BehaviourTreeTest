@@ -24,21 +24,12 @@ namespace Gun
 
 		void Start()
 		{
-			_trigger.mode = Trigger.FireMode.AUTO;
+
 		}
 
 		void Update()
 		{
-			if(state == GunAssemblyState.OK)
-			{
-				Fire();
-			}
-			CheckGun();
-			if (state == GunAssemblyState.MAGAZINE_EMPTY)
-			{
-				StopFire();
-				ReloadGun();
-			}
+
 		}
 
 		public void Fire()
@@ -74,6 +65,14 @@ namespace Gun
 				return state;
 			}
 		}
+
+        public void SetFireMode(Trigger.FireMode mode)
+        {
+            if (mode >= Trigger.FireMode.SINGLE && mode < Trigger.FireMode.MODE_COUNT)
+                _trigger.mode = mode;
+            else
+                _trigger.mode = Trigger.FireMode.AUTO;
+        }
 
 		public bool IsFiringSuccess()
 		{
