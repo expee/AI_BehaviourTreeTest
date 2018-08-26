@@ -51,9 +51,12 @@ public class Commander : Actor
     private Rigidbody _rigidbody;
     private Vector3 cornerA;
     private Vector3 cornerB;
+    private Collider[] excludedObstacles;
+    private List<Obstacle.BoxColliderDescriptor> includedObstacles;
 
     private void Awake()
     {
+        excludedObstacles = new Collider[30];
         transformRef = GetComponent<Transform>();
         _gait = GetComponent<Locomotion.BotGait>();
         _enemies = new List<Commander>();
@@ -91,38 +94,38 @@ public class Commander : Actor
 
     private void CreateBehaviourTree()
     {
-        _run              = new LeafNode(Run);
-        _celebrate = new LeafNode(Celebrate);
-        _pickNearestCover = new LeafNode(PickNearestCover);
-        _alreadyHasCover  = new LeafNode(AlreadyHasCover);
-        _takeCover = new LeafNode(TakeCover);
-        _reload = new LeafNode(Reload);
+        _run                       = new LeafNode(Run);
+        _celebrate                 = new LeafNode(Celebrate);
+        _pickNearestCover          = new LeafNode(PickNearestCover);
+        _alreadyHasCover           = new LeafNode(AlreadyHasCover);
+        _takeCover                 = new LeafNode(TakeCover);
+        _reload                    = new LeafNode(Reload);
         _randomlyTryToPickNewCover = new LeafNode(RandomlyTryToPickNewCover);
-        _hasStandingSpot = new LeafNode(HasStandingSpot);
-        _pickStandingSpot = new LeafNode(PickStandingSpot);
-        _aimAndFire = new LeafNode(AimAndFire);
-        //_considerationTaken = new SuceederNode(_randomlyTryToPickNewCover);
-        //_shouldReload = new TestNode(_reload, ShouldReload);
+        _hasStandingSpot           = new LeafNode(HasStandingSpot);
+        _pickStandingSpot          = new LeafNode(PickStandingSpot);
+        _aimAndFire                = new LeafNode(AimAndFire);
+        //_considerationTaken      = new SuceederNode(_randomlyTryToPickNewCover);
+        //_shouldReload            = new TestNode(_reload, ShouldReload);
 
         _checkCoverPicked = new SelectorNode(new List<Node> { _alreadyHasCover ,_pickNearestCover });
         _goToNearestCover = new SequenceNode(new List<Node> { _checkCoverPicked, _run});
-        _isNotInCover = new TestNode(_goToNearestCover, IsNotInCover);
+        _isNotInCover     = new TestNode(_goToNearestCover, IsNotInCover);
 
 
         _takeCoverAndReload = new SequenceNode(new List<Node> { _takeCover, _reload });
         //_isNotFiring1 = new TestNode(_takeCoverReloadAndConsiderFlanking, IsNotFiring);
 
 
-        _isMagazineNotEmpty = new TestNode(_aimAndFire, IsMagazineNotEmpty);
-        _isMagazineEmpty = new TestNode(_takeCoverAndReload, () => !IsMagazineNotEmpty());
-        _isSuppresed = new TestNode(_takeCoverAndReload, () => !IsNotSuppressed());
-        _isNotSuppresed = new TestNode(_isMagazineNotEmpty, IsNotSuppressed);
+        _isMagazineNotEmpty      = new TestNode(_aimAndFire, IsMagazineNotEmpty);
+        _isMagazineEmpty         = new TestNode(_takeCoverAndReload, () => !IsMagazineNotEmpty());
+        _isSuppresed             = new TestNode(_takeCoverAndReload, () => !IsNotSuppressed());
+        _isNotSuppresed          = new TestNode(_isMagazineNotEmpty, IsNotSuppressed);
         _checkStandingSpotPicked = new SelectorNode(new List<Node> { _hasStandingSpot, _pickStandingSpot});
-        _getOutOfCover = new SequenceNode(new List<Node> { _checkStandingSpotPicked, _run });
-        //_isNotFiring2 = new TestNode(_getOutOfCover, IsNotFiring);
-        _tryToFireAtEnemy = new SequenceNode(new List<Node> { _getOutOfCover, _isNotSuppresed });
+        _getOutOfCover           = new SequenceNode(new List<Node> { _checkStandingSpotPicked, _run });
+        //_isNotFiring2          = new TestNode(_getOutOfCover, IsNotFiring);
+        _tryToFireAtEnemy        = new SequenceNode(new List<Node> { _getOutOfCover, _isNotSuppresed });
 
-        _engage = new SelectorNode(new List<Node> { _isNotInCover, _isSuppresed, _isMagazineEmpty, _randomlyTryToPickNewCover, _tryToFireAtEnemy });
+        _engage         = new SelectorNode(new List<Node> { _isNotInCover, _isSuppresed, _isMagazineEmpty, _randomlyTryToPickNewCover, _tryToFireAtEnemy });
         _isEnemyPresent = new TestNode(_engage, IsEnemyPresent);
 
         _rootNode         = new SelectorNode(new List<Node> { _isEnemyPresent, _celebrate });
@@ -420,12 +423,25 @@ public class Commander : Actor
 
     private void FindRandomCover()
     {
+        includedObstacles = new List<Obstacle.BoxColliderDescriptor>(Game.Instance.covers);
+        
+        foreach(Commander enemy in _enemies)
+        {
+            int excludedCount = Physics.OverlapSphereNonAlloc(enemy.transformRef.position, 15f, excludedObstacles);
+            for(int i = 0; i < excludedCount; i++)
+            {
+                Obstacle.BoxColliderDescriptor obstacle = excludedObstacles[i].GetComponent<Obstacle.BoxColliderDescriptor>();
+                if (obstacle)
+                    includedObstacles.Remove(includedObstacles.Find(obs => obs.Equals(obstacle)));
+            }
+        }
+
         int trial = 0;
         do
         {
-            int randomIdx = Random.Range(0, Game.Instance.covers.Count);
-            if (!Game.Instance.covers[randomIdx].isOccupied)
-                _selectedCover = Game.Instance.covers[randomIdx];
+            int randomIdx = Random.Range(0, includedObstacles.Count);
+            if (!includedObstacles[randomIdx].isOccupied)
+                _selectedCover = includedObstacles[randomIdx];
         } while (_selectedCover == null || ++trial < Game.Instance.covers.Count);
 
         if (_selectedCover != null)
@@ -566,7 +582,7 @@ public class Commander : Actor
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(_coverSpot, .5f);
             //Gizmos.color = Color.blue;
-            //Gizmos.DrawWireSphere(_selectedCover.transformRef.position, 5f);
+            //Gizmos.DrawWireSphere(transformRef.position, 15f);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(cornerA, .5f);
             Gizmos.color = Color.white;
